@@ -92,7 +92,7 @@ public class PictureFragment extends Fragment {
     public void setResult(List<ViewModelResult> searchResult) {
 //        recyclerView.setVisibility(View.VISIBLE);
 //        progressBar.setVisibility(View.GONE);
-//        recyclerView.setAdapter(new PictureAdapter(searchResult));
+//        recyclerView.setAdapter(new TwitterAdapter(searchResult));
 //        if (searchResult.size() == 0) {
 //            showSnackBar(recyclerView);
 //        }

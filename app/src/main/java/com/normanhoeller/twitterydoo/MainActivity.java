@@ -1,6 +1,7 @@
 package com.normanhoeller.twitterydoo;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -25,6 +26,8 @@ import rx.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String ACCESS_TOKEN_PREFS = "access_token_prefs";
+    public static final String ACCESS_TOKEN = "access_token";
     @Inject
     public TwitterService twitterService;
     public String access_token;
@@ -43,12 +46,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String queryText = query.getText().toString();
-                if (!TextUtils.isEmpty(queryText)) {
+                if (!TextUtils.isEmpty(queryText) && !TextUtils.isEmpty(access_token)) {
                     startSearchActivity(queryText);
                 }
             }
         });
 
+        access_token = getSharedPreferences(ACCESS_TOKEN_PREFS, MODE_PRIVATE).getString(ACCESS_TOKEN, null);
         if (access_token == null) {
 
             String authInfo = "ygvd3VVOy9u068cvychbcpSri:d8FNUIE5s3AReyFHcXPVlyJOm8u8srPzfXdNNg3gTfi1KZBiEX";
@@ -63,11 +67,17 @@ public class MainActivity extends AppCompatActivity {
                         public void call(AuthenticationJSON authenticationJSON) {
                             if (authenticationJSON.getToken_type().equalsIgnoreCase("bearer")) {
                                 access_token = authenticationJSON.getAccess_token();
+                                storeAccessTokenInSharedPrefs();
                                 Log.d(TAG, "access_token: " + access_token);
                             }
                         }
                     });
         }
+    }
+
+    private void storeAccessTokenInSharedPrefs() {
+        SharedPreferences prefs = getSharedPreferences(ACCESS_TOKEN_PREFS, MODE_PRIVATE);
+        prefs.edit().putString(ACCESS_TOKEN, access_token).commit();
     }
 
     private void startSearchActivity(@NonNull String searchQuery) {

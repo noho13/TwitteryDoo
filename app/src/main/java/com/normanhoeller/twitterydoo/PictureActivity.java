@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 
-import com.normanhoeller.twitterydoo.model.SearchResult;
 import com.normanhoeller.twitterydoo.model.ViewModelResult;
 import com.normanhoeller.twitterydoo.ui.PictureFragment;
 
@@ -16,6 +15,7 @@ import java.util.List;
 public class PictureActivity extends AppCompatActivity implements WorkerFragment.Callback {
 
     public static final String SEARCH_QUERY = "search_query";
+    public static final String ACCESS_TOKEN = "access_token";
     private WorkerFragment fragment;
 
     @Override
@@ -37,7 +37,7 @@ public class PictureActivity extends AppCompatActivity implements WorkerFragment
     }
 
     public void sendQuery(String query) {
-        fragment.queryShutterStockService(query);
+        fragment.queryTwitterService(query);
     }
 
     @Override

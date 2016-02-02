@@ -25,5 +25,5 @@ public interface TwitterService {
     Observable<AuthenticationJSON> postTokens(@Header("Authorization") String authorization, @Field("grant_type") String text);
 
     @GET("/1.1/search/tweets.json?count=10")
-    Observable<SearchResult> getSearchResult(@Query("q") String query);
+    Observable<SearchResult> getSearchResult(@Header("Authorization") String authorization, @Query("q") String query);
 }

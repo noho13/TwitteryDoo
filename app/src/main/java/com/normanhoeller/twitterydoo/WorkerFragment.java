@@ -30,6 +30,7 @@ public class WorkerFragment extends Fragment {
     @Inject
     public TwitterService twitterService;
     private Callback callback;
+    private String authString;
 
     @Override
     public void onAttach(Context context) {
@@ -41,6 +42,8 @@ public class WorkerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        String accessToken = getActivity().getSharedPreferences(MainActivity.ACCESS_TOKEN_PREFS, Context.MODE_PRIVATE).getString(MainActivity.ACCESS_TOKEN, null);
+        authString = "Bearer " + accessToken;
     }
 
     @Override
@@ -49,8 +52,8 @@ public class WorkerFragment extends Fragment {
         ((TwitteryDooApplication) getActivity().getApplication()).getComponent().inject(this);
     }
 
-    public void queryShutterStockService(String query) {
-        twitterService.getSearchResult(query)
+    public void queryTwitterService(String query) {
+        twitterService.getSearchResult(authString, query)
                 .map(new Func1<SearchResult, List<ViewModelResult>>() {
                     @Override
                     public List<ViewModelResult> call(SearchResult searchResult) {
