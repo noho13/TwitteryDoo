@@ -17,6 +17,9 @@ import android.widget.EditText;
 import com.normanhoeller.twitterydoo.api.TwitterService;
 import com.normanhoeller.twitterydoo.model.AuthenticationJSON;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import javax.inject.Inject;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -47,6 +50,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String queryText = query.getText().toString();
                 if (!TextUtils.isEmpty(queryText) && !TextUtils.isEmpty(access_token)) {
+//                    try {
+//                        URLEncoder.encode(queryText, "UTF-8");
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                        return;
+//                    }
                     startSearchActivity(queryText);
                 }
             }

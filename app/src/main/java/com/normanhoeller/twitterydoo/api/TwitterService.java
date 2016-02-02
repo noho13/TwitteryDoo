@@ -4,14 +4,15 @@ package com.normanhoeller.twitterydoo.api;
 import com.normanhoeller.twitterydoo.model.AuthenticationJSON;
 import com.normanhoeller.twitterydoo.model.SearchResult;
 
-import retrofit.http.Body;
+import java.util.Map;
+
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.Headers;
 import retrofit.http.POST;
-import retrofit.http.Query;
+import retrofit.http.QueryMap;
 import rx.Observable;
 
 /**
@@ -25,5 +26,5 @@ public interface TwitterService {
     Observable<AuthenticationJSON> postTokens(@Header("Authorization") String authorization, @Field("grant_type") String text);
 
     @GET("/1.1/search/tweets.json?count=10")
-    Observable<SearchResult> getSearchResult(@Header("Authorization") String authorization, @Query("q") String query);
+    Observable<SearchResult> getSearchResult(@Header("Authorization") String authorization, @QueryMap Map<String, String> options);
 }

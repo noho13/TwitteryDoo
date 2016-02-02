@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,9 +27,11 @@ public class PictureFragment extends Fragment {
 
     private static final String TAG = PictureFragment.class.getSimpleName();
     private static final String PROGRESS_BAR_VISIBILITY = "progress_bar_visibility";
+    private static final int PAGE_SIZE = 10;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private TextView toolbarTitle;
+    private boolean isLoading;
 
     public static PictureFragment createInstance(String searchQuery) {
         PictureFragment fragment = new PictureFragment();
@@ -62,14 +65,41 @@ public class PictureFragment extends Fragment {
             }
         }
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+
+                int visibleItemCount = linearLayoutManager.getChildCount();
+                int totalItemCount = linearLayoutManager.getItemCount();
+                int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
+
+                Log.d(TAG, "visibleItemCount: " + visibleItemCount);
+                Log.d(TAG, "totalItemCount: " + totalItemCount);
+                Log.d(TAG, "firstVisibleItemCount: " + firstVisibleItemPosition);
+
+                if (!isLoading) {
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                            && firstVisibleItemPosition >= 0
+                            && totalItemCount >= PAGE_SIZE) {
+                        isLoading = true;
+                        Log.d(TAG, "load more items");
+                        queryTwitter(null);
+                    }
+                }
+            }
+        });
+
         String searchQuery = getArguments().getString(PictureActivity.SEARCH_QUERY);
         toolbarTitle.setText("looking for: " + searchQuery.toLowerCase());
-        queryShutterStock(searchQuery);
+        queryTwitter(searchQuery);
 
     }
 
-    private void queryShutterStock(String query) {
+    private void queryTwitter(String query) {
         ((PictureActivity) getActivity()).sendQuery(query);
     }
 
@@ -93,6 +123,15 @@ public class PictureFragment extends Fragment {
     public void setResult(List<ViewModelResult> searchResult) {
         recyclerView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
+
+        // adding items to adapter
+        if (recyclerView.getAdapter() != null && recyclerView.getAdapter().getItemCount() != 0) {
+            ((TwitterAdapter) recyclerView.getAdapter()).addItems(searchResult);
+            isLoading = false;
+            return;
+        }
+
+        // setting items for the first time
         recyclerView.setAdapter(new TwitterAdapter(searchResult));
         if (searchResult.size() == 0) {
             showSnackBar(recyclerView);

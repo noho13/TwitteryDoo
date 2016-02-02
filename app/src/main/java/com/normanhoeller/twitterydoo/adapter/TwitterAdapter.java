@@ -32,6 +32,12 @@ public class TwitterAdapter extends RecyclerView.Adapter<TwitterAdapter.ViewHold
         return new ViewHolder(view);
     }
 
+    public void addItems(List<ViewModelResult> items) {
+        pictureDataList.addAll(items);
+        this.notifyDataSetChanged();
+
+    }
+
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         ViewModelResult item = pictureDataList.get(position);
