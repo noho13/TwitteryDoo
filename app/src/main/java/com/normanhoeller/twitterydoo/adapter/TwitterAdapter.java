@@ -40,8 +40,8 @@ public class TwitterAdapter extends RecyclerView.Adapter<TwitterAdapter.ViewHold
             Picasso.with(viewHolder.imageView.getContext()).load(url).into(viewHolder.imageView);
         }
 
-        if (!TextUtils.isEmpty(item.getDescription())) {
-            viewHolder.description.setText(item.getDescription());
+        if (!TextUtils.isEmpty(item.getText())) {
+            viewHolder.description.setText(item.getText());
         }
     }
 

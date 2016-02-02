@@ -59,7 +59,7 @@ public class WorkerFragment extends Fragment {
                     public List<ViewModelResult> call(SearchResult searchResult) {
                         List<ViewModelResult> results = new ArrayList<>();
                         for (SearchResult.Statuses result : searchResult.getStatuses()) {
-//                            results.add(new ViewModelResult(result.getAssets().getPreview().getUrl(), result.getDescription()));
+                            results.add(new ViewModelResult(result.getUser().getProfile_image_url(), result.getText(), result.getUser().getCreated_at()));
                         }
                         return results;
                     }

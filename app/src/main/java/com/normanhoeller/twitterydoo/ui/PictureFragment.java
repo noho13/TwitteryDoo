@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.normanhoeller.twitterydoo.PictureActivity;
 import com.normanhoeller.twitterydoo.R;
+import com.normanhoeller.twitterydoo.adapter.TwitterAdapter;
 import com.normanhoeller.twitterydoo.model.ViewModelResult;
 
 import java.util.List;
@@ -90,11 +91,11 @@ public class PictureFragment extends Fragment {
     }
 
     public void setResult(List<ViewModelResult> searchResult) {
-//        recyclerView.setVisibility(View.VISIBLE);
-//        progressBar.setVisibility(View.GONE);
-//        recyclerView.setAdapter(new TwitterAdapter(searchResult));
-//        if (searchResult.size() == 0) {
-//            showSnackBar(recyclerView);
-//        }
+        recyclerView.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+        recyclerView.setAdapter(new TwitterAdapter(searchResult));
+        if (searchResult.size() == 0) {
+            showSnackBar(recyclerView);
+        }
     }
 }
