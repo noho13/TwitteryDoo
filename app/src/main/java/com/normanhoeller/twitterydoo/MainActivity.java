@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
             String authInfo = "ygvd3VVOy9u068cvychbcpSri:d8FNUIE5s3AReyFHcXPVlyJOm8u8srPzfXdNNg3gTfi1KZBiEX";
             String auth = "Basic " + Base64.encodeToString(authInfo.getBytes(), Base64.NO_WRAP);
-            String body = "grant_type=client_credentials";
+            String body = "client_credentials";
 
             twitterService.postTokens(auth, body)
                     .subscribeOn(Schedulers.io()) // upwards runs on io
