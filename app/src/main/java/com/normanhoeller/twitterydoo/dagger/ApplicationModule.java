@@ -9,14 +9,14 @@ import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by norman on 31/08/15.
+ * Created by norman on 02/02/16.
  */
 @Module(includes = HelperModule.class)
 public class ApplicationModule {
 
     @Provides
     @Singleton
-    public TwitterService provideShutterStockService(RestClient restClient) {
+    public TwitterService provideTwitterService(RestClient restClient) {
         return restClient.getService();
     }
 }

@@ -25,7 +25,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
 /**
- * Created by norman on 01/09/15.
+ * Created by norman on 02/02/16.
  */
 @RunWith(AndroidJUnit4.class)
 public class TestPictureActivity {
@@ -36,7 +36,7 @@ public class TestPictureActivity {
             true,     // initialTouchMode
             false);   // launchActivity. False so we can customize the intent per test method
     @Inject
-    TwitterService shutterStockService;
+    TwitterService twitterService;
     private PictureFragment fragment;
 
     @Before
@@ -57,13 +57,14 @@ public class TestPictureActivity {
 
     @Test
     public void fragmentNotNull() {
-        assertNotNull(shutterStockService);
+        assertNotNull(twitterService);
         assertNotNull(fragment);
     }
 
     @Test
     public void itemCount() {
         RecyclerView recyclerView = (RecyclerView) fragment.getView().findViewById(R.id.rv_item_grid);
+        assertNotNull(recyclerView);
         int itemCount = recyclerView.getAdapter().getItemCount();
         int expectedItems = 1;
         assertEquals(expectedItems, itemCount);

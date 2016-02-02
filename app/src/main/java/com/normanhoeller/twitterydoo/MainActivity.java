@@ -39,8 +39,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        ((TwitteryDooApplication) getApplication()).getComponent().inject(this);
+        TwitteryDooApplication application = (TwitteryDooApplication) getApplication();
+        TwitteryDooApplication.Production productionCompontent = (TwitteryDooApplication.Production) application.getComponent();
+        productionCompontent.inject(this);
 
         final EditText query = (EditText) findViewById(R.id.et_query);
         FloatingActionButton goSearch = (FloatingActionButton) findViewById(R.id.btn_go);
@@ -50,12 +51,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String queryText = query.getText().toString();
                 if (!TextUtils.isEmpty(queryText) && !TextUtils.isEmpty(access_token)) {
-//                    try {
-//                        URLEncoder.encode(queryText, "UTF-8");
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                        return;
-//                    }
                     startSearchActivity(queryText);
                 }
             }

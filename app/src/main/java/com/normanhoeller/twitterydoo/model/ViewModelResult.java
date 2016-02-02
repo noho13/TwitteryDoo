@@ -1,7 +1,7 @@
 package com.normanhoeller.twitterydoo.model;
 
 /**
- * Created by norman on 29/09/15.
+ * Created by norman on 02/02/16.
  */
 public class ViewModelResult {
 

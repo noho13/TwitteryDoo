@@ -11,7 +11,7 @@ import javax.inject.Singleton;
 import dagger.Component;
 
 /**
- * Created by norman on 31/08/15.
+ * Created by norman on 02/02/16.
  */
 public class TwitteryDooApplication extends Application {
 
@@ -20,6 +20,7 @@ public class TwitteryDooApplication extends Application {
     @Singleton
     @Component(modules = ApplicationModule.class)
     public interface Production extends ApplicationComponent {
+        void inject(MainActivity activity);
     }
 
     @Override

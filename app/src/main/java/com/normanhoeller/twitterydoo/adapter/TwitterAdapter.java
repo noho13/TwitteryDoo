@@ -15,7 +15,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 /**
- * Created by norman on 31/08/15.
+ * Created by norman on 02/02/16.
  */
 public class TwitterAdapter extends RecyclerView.Adapter<TwitterAdapter.ViewHolder> {
 

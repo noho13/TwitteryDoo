@@ -24,7 +24,7 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by norman on 02/09/15.
+ * Created by norman on 02/02/16.
  */
 public class WorkerFragment extends Fragment {
 
@@ -35,7 +35,6 @@ public class WorkerFragment extends Fragment {
     private Callback callback;
     private String authString;
     private SearchResult.SearchMetaData nextResults;
-    private long id;
     private Map<String, String> queryMap;
 
     @Override
@@ -62,7 +61,7 @@ public class WorkerFragment extends Fragment {
     public void queryTwitterService(String query) {
         if (TextUtils.isEmpty(query) && nextResults == null) {
             return;
-        } else if (TextUtils.isEmpty(query) && nextResults != null) {
+        } else if (TextUtils.isEmpty(query) && nextResults != null && nextResults.getNext_results() != null) {
             String nextMaxId = nextResults.getNext_results().split("max_id=")[1].split("&")[0];
             query = nextResults.getQuery();
             queryMap.put("max_id", nextMaxId);
@@ -75,7 +74,6 @@ public class WorkerFragment extends Fragment {
                     @Override
                     public List<ViewModelResult> call(SearchResult searchResult) {
                         List<ViewModelResult> results = new ArrayList<>();
-                        Log.d(TAG, "metaData: " + searchResult.getSearch_metadata().getNext_results());
                         nextResults = searchResult.getSearch_metadata();
 
                         for (SearchResult.Statuses result : searchResult.getStatuses()) {
@@ -93,6 +91,11 @@ public class WorkerFragment extends Fragment {
                         if (callback != null) {
                             callback.setResult(searchResult);
                         }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.d(TAG, "onError: " + throwable.getMessage());
                     }
                 });
     }

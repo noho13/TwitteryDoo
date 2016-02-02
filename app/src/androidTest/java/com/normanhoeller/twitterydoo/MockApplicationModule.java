@@ -7,45 +7,46 @@ import com.normanhoeller.twitterydoo.model.SearchResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import retrofit.http.Field;
 import retrofit.http.Header;
-import retrofit.http.Query;
+import retrofit.http.QueryMap;
 import rx.Observable;
 
 /**
- * Created by norman on 01/09/15.
+ * Created by norman on 02/02/16.
  */
 @Module
 public class MockApplicationModule {
 
     @Provides
     @Singleton
-    public TwitterService provideRestClient() {
+    public TwitterService provideTwitterService() {
         return new TwitterService() {
             @Override
-            public Observable<AuthenticationJSON> postTokens(@Header("Authorization") String authorization) {
+            public Observable<AuthenticationJSON> postTokens(@Header("Authorization") String authorization, @Field("grant_type") String text) {
                 return null;
             }
 
             @Override
-            public Observable<SearchResult> getSearchResult(@Query("query") String query) {
+            public Observable<SearchResult> getSearchResult(@Header("Authorization") String authorization, @QueryMap Map<String, String> options) {
                 SearchResult searchResult = new SearchResult();
-//                searchResult.setPage(2);
-//                SearchResult.Data data = new SearchResult.Data();
-//                SearchResult.Data.Assets assets = new SearchResult.Data.Assets();
-//                SearchResult.Data.Assets.Preview preview = new SearchResult.Data.Assets.Preview();
-//                preview.setUrl("");
-//                assets.setPreview(preview);
-//                data.setAssets(assets);
-//                List<SearchResult.Data> dataList = new ArrayList<>();
-//                dataList.add(data);
-//                searchResult.setData(dataList);
+                SearchResult.Statuses status = new SearchResult.Statuses();
+                SearchResult.User user = new SearchResult.User();
+                status.setText("This is a fake tweet");
+                status.setUser(user);
+                List<SearchResult.Statuses> statusesList = new ArrayList<>();
+                statusesList.add(status);
+                searchResult.setStatuses(statusesList);
+
                 return Observable.just(searchResult);
             }
+
         };
     }
 }
