@@ -1,0 +1,26 @@
+package com.normanhoeller.twitterydoo.api;
+
+
+import com.normanhoeller.twitterydoo.model.AuthenticationJSON;
+import com.normanhoeller.twitterydoo.model.SearchResult;
+
+import retrofit.http.Body;
+import retrofit.http.GET;
+import retrofit.http.Header;
+import retrofit.http.Headers;
+import retrofit.http.POST;
+import retrofit.http.Query;
+import rx.Observable;
+
+/**
+ * Created by norman on 02/02/16.
+ */
+public interface TwitterService {
+
+    @POST("/oauth2/token")
+    @Headers("Content-Type: application/x-www-form-urlencoded;charset=UTF-8")
+    Observable<AuthenticationJSON> postTokens(@Header("Authorization") String authorization, @Body String text);
+
+    @GET("/1.1/search/tweets.json?count=10")
+    Observable<SearchResult> getSearchResult(@Query("q") String query);
+}
