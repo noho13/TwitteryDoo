@@ -20,7 +20,7 @@ import com.normanhoeller.twitterydoo.model.ViewModelResult;
 import java.util.List;
 
 /**
- * Created by norman on 31/08/15.
+ * Created by norman on 02/02/16.
  */
 public class PictureFragment extends Fragment {
 

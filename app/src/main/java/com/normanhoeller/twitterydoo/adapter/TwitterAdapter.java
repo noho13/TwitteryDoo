@@ -43,6 +43,10 @@ public class TwitterAdapter extends RecyclerView.Adapter<TwitterAdapter.ViewHold
         if (!TextUtils.isEmpty(item.getText())) {
             viewHolder.description.setText(item.getText());
         }
+
+        if (!TextUtils.isEmpty(item.getDate())) {
+            viewHolder.date.setText(item.getDate());
+        }
     }
 
     @Override
@@ -53,11 +57,13 @@ public class TwitterAdapter extends RecyclerView.Adapter<TwitterAdapter.ViewHold
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         TextView description;
+        TextView date;
 
         ViewHolder(View itemView) {
             super(itemView);
             this.imageView = (ImageView) itemView.findViewById(R.id.iv_picture);
             this.description = (TextView) itemView.findViewById(R.id.tv_line1);
+            this.date = (TextView) itemView.findViewById(R.id.tv_line2);
         }
     }
 }
