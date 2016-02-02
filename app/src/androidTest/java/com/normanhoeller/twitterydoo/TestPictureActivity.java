@@ -6,6 +6,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.TextView;
 
 import com.normanhoeller.twitterydoo.api.TwitterService;
 import com.normanhoeller.twitterydoo.dagger.ApplicationComponent;
@@ -68,6 +70,17 @@ public class TestPictureActivity {
         int itemCount = recyclerView.getAdapter().getItemCount();
         int expectedItems = 1;
         assertEquals(expectedItems, itemCount);
+    }
+
+    @Test
+    public void modelDataCorrect() {
+        RecyclerView recyclerView = (RecyclerView) fragment.getView().findViewById(R.id.rv_item_grid);
+        assertNotNull(recyclerView);
+        View child = recyclerView.getLayoutManager().getChildAt(0);
+        TextView textView = (TextView) child.findViewById(R.id.tv_line1);
+        String expected = "This is a fake tweet";
+        String result = textView.getText().toString();
+        assertEquals(expected, result);
     }
 
     @Component(modules = MockApplicationModule.class)
