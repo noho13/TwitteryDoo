@@ -47,4 +47,12 @@ public class PictureActivity extends AppCompatActivity implements WorkerFragment
             fragment.setResult(searchResult);
         }
     }
+
+    @Override
+    public void showProgressView() {
+        PictureFragment fragment = (PictureFragment) getSupportFragmentManager().findFragmentById(android.R.id.content);
+        if (fragment != null) {
+            fragment.showProgressView();
+        }
+    }
 }

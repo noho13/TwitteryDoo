@@ -66,6 +66,10 @@ public class WorkerFragment extends Fragment {
             query = nextResults.getQuery();
             queryMap.put("max_id", nextMaxId);
             queryMap.put("include_entities", String.valueOf(true));
+            callback.showProgressView();
+        } else if (nextResults != null && nextResults.getNext_results() == null) {
+            // no more tweets
+            return;
         }
 
         queryMap.put("q", query);
@@ -108,5 +112,6 @@ public class WorkerFragment extends Fragment {
 
     public interface Callback {
         void setResult(List<ViewModelResult> searchResult);
+        void showProgressView();
     }
 }

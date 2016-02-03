@@ -86,7 +86,6 @@ public class PictureFragment extends Fragment {
                             && firstVisibleItemPosition >= 0
                             && totalItemCount >= PAGE_SIZE) {
                         isLoading = true;
-                        Log.d(TAG, "load more items");
                         queryTwitter(null);
                     }
                 }
@@ -98,6 +97,7 @@ public class PictureFragment extends Fragment {
         queryTwitter(searchQuery);
 
     }
+
 
     private void queryTwitter(String query) {
         ((PictureActivity) getActivity()).sendQuery(query);
@@ -126,7 +126,10 @@ public class PictureFragment extends Fragment {
 
         // adding items to adapter
         if (recyclerView.getAdapter() != null && recyclerView.getAdapter().getItemCount() != 0) {
-            ((TwitterAdapter) recyclerView.getAdapter()).addItems(searchResult);
+            ((TwitterAdapter) recyclerView.getAdapter()).removeNullItemToHideProgressView();
+            if (searchResult != null) {
+                ((TwitterAdapter) recyclerView.getAdapter()).addItems(searchResult);
+            }
             isLoading = false;
             return;
         }
@@ -136,5 +139,9 @@ public class PictureFragment extends Fragment {
         if (searchResult.size() == 0) {
             showSnackBar(recyclerView);
         }
+    }
+
+    public void showProgressView() {
+        ((TwitterAdapter) recyclerView.getAdapter()).addNullItemToShowProgressView();
     }
 }

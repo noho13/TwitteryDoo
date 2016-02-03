@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.normanhoeller.twitterydoo.R;
@@ -17,9 +18,11 @@ import java.util.List;
 /**
  * Created by norman on 02/02/16.
  */
-public class TwitterAdapter extends RecyclerView.Adapter<TwitterAdapter.ViewHolder> {
+public class TwitterAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String TAG = TwitterAdapter.class.getSimpleName();
+    private static final int TYPE_VIEW = 0;
+    private static final int TYPE_PROGRESS = 1;
     private List<ViewModelResult> pictureDataList;
 
     public TwitterAdapter(List<ViewModelResult> dataList) {
@@ -27,31 +30,64 @@ public class TwitterAdapter extends RecyclerView.Adapter<TwitterAdapter.ViewHold
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_picture, parent, false);
-        return new ViewHolder(view);
+    public int getItemViewType(int position) {
+        return pictureDataList.get(position) != null ? TYPE_VIEW : TYPE_PROGRESS;
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view;
+        switch (viewType) {
+            case TYPE_VIEW:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_picture, parent, false);
+                return new ItemViewHolder(view);
+            case TYPE_PROGRESS:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_progress, parent, false);
+                return new ProgressViewHolder(view);
+            default:
+                return null;
+        }
     }
 
     public void addItems(List<ViewModelResult> items) {
         pictureDataList.addAll(items);
         this.notifyDataSetChanged();
+    }
 
+    public void addNullItemToShowProgressView() {
+        pictureDataList.add(null);
+        notifyItemInserted(pictureDataList.size() - 1);
+    }
+
+    public void removeNullItemToHideProgressView() {
+        pictureDataList.remove(pictureDataList.size() -1);
+        notifyItemRemoved(pictureDataList.size() - 1);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        switch (getItemViewType(position)) {
+            case TYPE_VIEW:
+                populateItem((ItemViewHolder) viewHolder, position);
+                break;
+            case TYPE_PROGRESS:
+                ((ProgressViewHolder) viewHolder).progressBar.setIndeterminate(true);
+        }
+    }
+
+    private void populateItem(ItemViewHolder itemViewHolder, int position) {
         ViewModelResult item = pictureDataList.get(position);
         String url = item.getUrl();
         if (!TextUtils.isEmpty(url)) {
-            Picasso.with(viewHolder.imageView.getContext()).load(url).into(viewHolder.imageView);
+            Picasso.with(itemViewHolder.imageView.getContext()).load(url).into(itemViewHolder.imageView);
         }
 
         if (!TextUtils.isEmpty(item.getText())) {
-            viewHolder.description.setText(item.getText());
+            itemViewHolder.description.setText(item.getText());
         }
 
         if (!TextUtils.isEmpty(item.getDate())) {
-            viewHolder.date.setText(item.getDate());
+            itemViewHolder.date.setText(item.getDate());
         }
     }
 
@@ -60,16 +96,25 @@ public class TwitterAdapter extends RecyclerView.Adapter<TwitterAdapter.ViewHold
         return pictureDataList.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ItemViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         TextView description;
         TextView date;
 
-        ViewHolder(View itemView) {
+        ItemViewHolder(View itemView) {
             super(itemView);
             this.imageView = (ImageView) itemView.findViewById(R.id.iv_picture);
             this.description = (TextView) itemView.findViewById(R.id.tv_line1);
             this.date = (TextView) itemView.findViewById(R.id.tv_line2);
+        }
+    }
+
+    static class ProgressViewHolder extends RecyclerView.ViewHolder {
+        ProgressBar progressBar;
+
+        ProgressViewHolder(View view) {
+            super(view);
+            progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         }
     }
 }
