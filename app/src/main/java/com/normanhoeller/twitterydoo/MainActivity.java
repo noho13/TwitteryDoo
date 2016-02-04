@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         access_token = getSharedPreferences(ACCESS_TOKEN_PREFS, MODE_PRIVATE).getString(ACCESS_TOKEN, null);
         if (access_token == null) {
 
-            String authInfo = "ygvd3VVOy9u068cvychbcpSri:d8FNUIE5s3AReyFHcXPVlyJOm8u8srPzfXdNNg3gTfi1KZBiEX";
+            String authInf";
             String auth = "Basic " + Base64.encodeToString(authInfo.getBytes(), Base64.NO_WRAP);
             String body = "client_credentials";
 
