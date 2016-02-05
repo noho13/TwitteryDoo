@@ -20,15 +20,16 @@ public class TwitteryDooApplication extends Application {
     @Singleton
     @Component(modules = ApplicationModule.class)
     public interface Production extends ApplicationComponent {
-        void inject(MainActivity activity);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        DataManager dataManager = DataManager.getInstance();
         if (component == null) {
-            component = DaggerTwitteryDooApplication_Production.builder().applicationModule(new ApplicationModule()).build();
+            component = DaggerTwitteryDooApplication_Production.builder().applicationModule(new ApplicationModule(this)).build();
         }
+        component.inject(dataManager);
     }
 
     public ApplicationComponent getComponent() {

@@ -12,47 +12,16 @@ import java.util.List;
 /**
  * Created by norman on 31/08/15.
  */
-public class PictureActivity extends AppCompatActivity implements WorkerFragment.Callback {
+public class PictureActivity extends AppCompatActivity{
 
     public static final String SEARCH_QUERY = "search_query";
-    public static final String ACCESS_TOKEN = "access_token";
-    private WorkerFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupWorker();
         if (savedInstanceState == null) {
             PictureFragment fragment = PictureFragment.createInstance(getIntent().getStringExtra(SEARCH_QUERY));
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, fragment).commit();
-        }
-    }
-
-    private void setupWorker() {
-        fragment = (WorkerFragment) getSupportFragmentManager().findFragmentByTag(WorkerFragment.FRAG_TAG);
-        if (fragment == null) {
-            fragment = new WorkerFragment();
-            getSupportFragmentManager().beginTransaction().add(fragment, WorkerFragment.FRAG_TAG).commit();
-        }
-    }
-
-    public void sendQuery(String query) {
-        fragment.queryTwitterService(query);
-    }
-
-    @Override
-    public void setResult(List<ViewModelResult> searchResult) {
-        PictureFragment fragment = (PictureFragment) getSupportFragmentManager().findFragmentById(android.R.id.content);
-        if (fragment != null) {
-            fragment.setResult(searchResult);
-        }
-    }
-
-    @Override
-    public void showProgressView() {
-        PictureFragment fragment = (PictureFragment) getSupportFragmentManager().findFragmentById(android.R.id.content);
-        if (fragment != null) {
-            fragment.showProgressView();
         }
     }
 }

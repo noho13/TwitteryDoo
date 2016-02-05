@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.normanhoeller.twitterydoo.DataManager;
 import com.normanhoeller.twitterydoo.PictureActivity;
 import com.normanhoeller.twitterydoo.R;
 import com.normanhoeller.twitterydoo.adapter.TwitterAdapter;
@@ -23,7 +24,7 @@ import java.util.List;
 /**
  * Created by norman on 02/02/16.
  */
-public class PictureFragment extends Fragment {
+public class PictureFragment extends Fragment implements DataManager.Callback {
 
     private static final String TAG = PictureFragment.class.getSimpleName();
     private static final String PROGRESS_BAR_VISIBILITY = "progress_bar_visibility";
@@ -32,6 +33,7 @@ public class PictureFragment extends Fragment {
     private ProgressBar progressBar;
     private TextView toolbarTitle;
     private boolean isLoading;
+    private DataManager dataManager;
 
     public static PictureFragment createInstance(String searchQuery) {
         PictureFragment fragment = new PictureFragment();
@@ -55,6 +57,8 @@ public class PictureFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        dataManager = DataManager.getInstance();
+        dataManager.setCallback(this);
         if (savedInstanceState != null) {
             int progressVisibility = savedInstanceState.getInt(PROGRESS_BAR_VISIBILITY);
             if (progressVisibility == View.VISIBLE) {
@@ -100,7 +104,7 @@ public class PictureFragment extends Fragment {
 
 
     private void queryTwitter(String query) {
-        ((PictureActivity) getActivity()).sendQuery(query);
+        dataManager.queryTwitterService(query);
     }
 
     private void showSnackBar(View view) {
@@ -120,6 +124,7 @@ public class PictureFragment extends Fragment {
         outState.putInt(PROGRESS_BAR_VISIBILITY, progressBar.getVisibility());
     }
 
+    @Override
     public void setResult(List<ViewModelResult> searchResult) {
         recyclerView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
@@ -141,7 +146,14 @@ public class PictureFragment extends Fragment {
         }
     }
 
+    @Override
     public void showProgressView() {
         ((TwitterAdapter) recyclerView.getAdapter()).addNullItemToShowProgressView();
+    }
+
+    @Override
+    public void onDetach() {
+        dataManager.setCallback(null);
+        super.onDetach();
     }
 }

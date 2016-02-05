@@ -1,13 +1,13 @@
 package com.normanhoeller.twitterydoo;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.content.SharedPreferences;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 
 import com.normanhoeller.twitterydoo.api.TwitterService;
+import com.normanhoeller.twitterydoo.model.AuthenticationJSON;
 import com.normanhoeller.twitterydoo.model.SearchResult;
 import com.normanhoeller.twitterydoo.model.ViewModelResult;
 
@@ -24,38 +24,61 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by norman on 02/02/16.
+ * Created by norman on 04/02/16.
+ * Singleton hosting TwitterService to access Data
  */
-public class WorkerFragment extends Fragment {
+public class DataManager {
 
-    public static final String FRAG_TAG = "frag_tag";
-    private static final String TAG = WorkerFragment.class.getSimpleName();
+    public static final String ACCESS_TOKEN_PREFS = "access_token_prefs";
+    public static final String ACCESS_TOKEN = "access_token";
+    private static final String TAG = DataManager.class.getSimpleName();
+    private static DataManager instance;
     @Inject
     public TwitterService twitterService;
+    @Inject
+    public Context context;
+    private String authInfo = "ygvd3VVOy9u068cvychbcpSri:d8FNUIE5s3AReyFHcXPVlyJOm8u8srPzfXdNNg3gTfi1KZBiEX";
+    private String auth = "Basic " + Base64.encodeToString(authInfo.getBytes(), Base64.NO_WRAP);
+    private String body = "client_credentials";
+
     private Callback callback;
     private String authString;
     private SearchResult.SearchMetaData nextResults;
-    private Map<String, String> queryMap;
+    private Map<String, String> queryMap = new HashMap<>();
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        callback = context instanceof Activity ? (Callback) context : null;
+    private DataManager() {
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
-        String accessToken = getActivity().getSharedPreferences(MainActivity.ACCESS_TOKEN_PREFS, Context.MODE_PRIVATE).getString(MainActivity.ACCESS_TOKEN, null);
+    public static DataManager getInstance() {
+        if (instance == null) {
+            instance = new DataManager();
+        }
+        return instance;
+    }
+
+    public void getAccessTokenFromTwitter() {
+        twitterService.postTokens(auth, body)
+                .subscribeOn(Schedulers.io()) // upwards runs on io
+                .observeOn(AndroidSchedulers.mainThread()) // downwards runs on mainThread;
+                .subscribe(new Action1<AuthenticationJSON>() {
+                    @Override
+                    public void call(AuthenticationJSON authenticationJSON) {
+                        if (authenticationJSON.getToken_type().equalsIgnoreCase("bearer")) {
+                            String accessToken = authenticationJSON.getAccess_token();
+                            storeAccessTokenInSharedPrefs(accessToken);
+                        }
+                    }
+                });
+    }
+
+    public void storeAccessTokenInSharedPrefs(String accessToken) {
         authString = "Bearer " + accessToken;
-        queryMap = new HashMap<>();
+        SharedPreferences prefs = context.getSharedPreferences(ACCESS_TOKEN_PREFS, Context.MODE_PRIVATE);
+        prefs.edit().putString(ACCESS_TOKEN, accessToken).commit();
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        ((TwitteryDooApplication) getActivity().getApplication()).getComponent().inject(this);
+    public boolean isAccessTokenAvailable() {
+        return context.getSharedPreferences(ACCESS_TOKEN_PREFS, Context.MODE_PRIVATE).getString(ACCESS_TOKEN, null) != null;
     }
 
     public void queryTwitterService(String query) {
@@ -66,7 +89,9 @@ public class WorkerFragment extends Fragment {
             query = nextResults.getQuery();
             queryMap.put("max_id", nextMaxId);
             queryMap.put("include_entities", String.valueOf(true));
-            callback.showProgressView();
+            if (callback != null) {
+                callback.showProgressView();
+            }
         } else if (nextResults != null && nextResults.getNext_results() == null) {
             // no more tweets
             return;
@@ -104,14 +129,13 @@ public class WorkerFragment extends Fragment {
                 });
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        callback = null;
+    public void setCallback(Callback callback) {
+        this.callback = callback;
     }
 
     public interface Callback {
         void setResult(List<ViewModelResult> searchResult);
+
         void showProgressView();
     }
 }
