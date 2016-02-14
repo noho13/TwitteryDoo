@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.normanhoeller.twitterydoo.DataManager;
 import com.normanhoeller.twitterydoo.PictureActivity;
 import com.normanhoeller.twitterydoo.R;
 import com.normanhoeller.twitterydoo.adapter.TwitterAdapter;
@@ -24,7 +23,7 @@ import java.util.List;
 /**
  * Created by norman on 02/02/16.
  */
-public class PictureFragment extends Fragment implements DataManager.Callback {
+public class PictureFragment extends Fragment implements ResultsListView {
 
     private static final String TAG = PictureFragment.class.getSimpleName();
     private static final String PROGRESS_BAR_VISIBILITY = "progress_bar_visibility";
@@ -33,7 +32,7 @@ public class PictureFragment extends Fragment implements DataManager.Callback {
     private ProgressBar progressBar;
     private TextView toolbarTitle;
     private boolean isLoading;
-    private DataManager dataManager;
+    private ResultsListPresenterImpl resultsListPresenter;
 
     public static PictureFragment createInstance(String searchQuery) {
         PictureFragment fragment = new PictureFragment();
@@ -57,8 +56,8 @@ public class PictureFragment extends Fragment implements DataManager.Callback {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        dataManager = DataManager.getInstance();
-        dataManager.setCallback(this);
+        resultsListPresenter = new ResultsListPresenterImpl(this);
+
         if (savedInstanceState != null) {
             int progressVisibility = savedInstanceState.getInt(PROGRESS_BAR_VISIBILITY);
             if (progressVisibility == View.VISIBLE) {
@@ -90,24 +89,21 @@ public class PictureFragment extends Fragment implements DataManager.Callback {
                             && firstVisibleItemPosition >= 0
                             && totalItemCount >= PAGE_SIZE) {
                         isLoading = true;
-                        queryTwitter(null);
+                        loadMoreTweets();
+
                     }
                 }
             }
         });
 
         String searchQuery = getArguments().getString(PictureActivity.SEARCH_QUERY);
-        toolbarTitle.setText("looking for: " + searchQuery.toLowerCase());
+        resultsListPresenter.setToolbarTitle(searchQuery);
         queryTwitter(searchQuery);
 
     }
 
-
-    private void queryTwitter(String query) {
-        dataManager.queryTwitterService(query);
-    }
-
-    private void showSnackBar(View view) {
+    @Override
+    public void showSnackBar(View view) {
         Snackbar.make(view, R.string.no_results, Snackbar.LENGTH_LONG)
                 .setAction(R.string.hit_back, new View.OnClickListener() {
                     @Override
@@ -126,8 +122,6 @@ public class PictureFragment extends Fragment implements DataManager.Callback {
 
     @Override
     public void setResult(List<ViewModelResult> searchResult) {
-        recyclerView.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.GONE);
 
         // adding items to adapter
         if (recyclerView.getAdapter() != null && recyclerView.getAdapter().getItemCount() != 0) {
@@ -147,13 +141,40 @@ public class PictureFragment extends Fragment implements DataManager.Callback {
     }
 
     @Override
-    public void showProgressView() {
+    public void showLoadMoreProgressView() {
         ((TwitterAdapter) recyclerView.getAdapter()).addNullItemToShowProgressView();
     }
 
     @Override
-    public void onDetach() {
-        dataManager.setCallback(null);
-        super.onDetach();
+    public void hideProgressView() {
+        recyclerView.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void setToolbarTitle(String toolbarTitleText) {
+        toolbarTitle.setText("looking for: " + toolbarTitleText.toLowerCase());
+    }
+
+    @Override
+    public void loadMoreTweets() {
+        resultsListPresenter.queryTwitter(null);
+    }
+
+    @Override
+    public void queryTwitter(String searchQuery) {
+        resultsListPresenter.queryTwitter(searchQuery);
+    }
+
+    @Override
+    public void onResume() {
+        resultsListPresenter.onResume();
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroy() {
+        resultsListPresenter.onDestroy();
+        super.onDestroy();
     }
 }

@@ -42,6 +42,7 @@ public class DataManager {
     private String body = "client_credentials";
 
     private Callback callback;
+    String accessToken;
     private String authString;
     private SearchResult.SearchMetaData nextResults;
     private Map<String, String> queryMap = new HashMap<>();
@@ -68,6 +69,11 @@ public class DataManager {
                             storeAccessTokenInSharedPrefs(accessToken);
                         }
                     }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.d(TAG, "error while trying to get accesstoken from Twitter");
+                    }
                 });
     }
 
@@ -78,7 +84,12 @@ public class DataManager {
     }
 
     public boolean isAccessTokenAvailable() {
-        return context.getSharedPreferences(ACCESS_TOKEN_PREFS, Context.MODE_PRIVATE).getString(ACCESS_TOKEN, null) != null;
+        accessToken = context.getSharedPreferences(ACCESS_TOKEN_PREFS, Context.MODE_PRIVATE).getString(ACCESS_TOKEN, null);
+        Log.d(TAG, "accessToken is: " + accessToken);
+        if (accessToken != null) {
+            authString = "Bearer " + accessToken;
+        }
+        return accessToken != null;
     }
 
     public void queryTwitterService(String query) {
@@ -90,7 +101,7 @@ public class DataManager {
             queryMap.put("max_id", nextMaxId);
             queryMap.put("include_entities", String.valueOf(true));
             if (callback != null) {
-                callback.showProgressView();
+                callback.showLoadMoreProgressView();
             }
         } else if (nextResults != null && nextResults.getNext_results() == null) {
             // no more tweets
@@ -136,6 +147,6 @@ public class DataManager {
     public interface Callback {
         void setResult(List<ViewModelResult> searchResult);
 
-        void showProgressView();
+        void showLoadMoreProgressView();
     }
 }

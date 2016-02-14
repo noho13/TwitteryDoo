@@ -7,6 +7,7 @@ package com.normanhoeller.twitterydoo;
 public interface MainView {
 
     void navigateToPictureActivity(String searchQuery);
+    // used to show while authentication is being done - not implemented yet
     void showLoadingAnimation();
     void hideLoadingAnimation();
 
